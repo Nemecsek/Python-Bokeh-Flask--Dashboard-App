@@ -15,6 +15,7 @@ import pandas as pd
 from bokeh.embed import components
 from bokeh.layouts import column, gridplot, layout, row
 from bokeh.models import ColumnDataSource, HoverTool, PrintfTickFormatter
+from bokeh.models.tickers import SingleIntervalTicker
 from bokeh.plotting import figure
 from bokeh.transform import factor_cmap
 
@@ -135,7 +136,8 @@ def survived_bar_chart(dataset, title, cpalette=None):
     })
 
     hover_tool = HoverTool(
-        tooltips=[('Survived?', '@possibilities_txt'), ('Count', '@values')]
+        tooltips=[('Survived?', '@possibilities_txt'),
+                  ('Count', '@values')]
     )
     
     p = figure(tools=[hover_tool], plot_height=400, title=title)
@@ -190,7 +192,7 @@ def class_titles_bar_chart(dataset, title, cpalette=None):
 
 def age_hist(dataset, title, color=palette[1]):
 
-    hist, edges = np.histogram(dataset['Age'].fillna(df['Age'].mean()), bins=25)
+    hist, edges = np.histogram(dataset['Age'].fillna(df['Age'].mean()), bins=18, range=(0, 90))
     
     source = ColumnDataSource({
         'hist': hist,
@@ -199,8 +201,7 @@ def age_hist(dataset, title, color=palette[1]):
     })
 
     hover_tool = HoverTool(
-        tooltips=[('From', '@edges_left'), ('Thru', '@edges_right'), ('Count', '@hist')], 
-        mode='vline'
+        tooltips=[('From', '@edges_left'), ('Thru', '@edges_right'), ('Count', '@hist')], mode='vline'
     )
     
     p = figure(plot_height=400, title=title, tools=[hover_tool])
@@ -208,6 +209,7 @@ def age_hist(dataset, title, color=palette[1]):
             fill_color=color, line_color='black')
 
     plot_styler(p)
+    p.xaxis.ticker = SingleIntervalTicker(interval=10, num_minor_ticks=2)
     p.sizing_mode = 'scale_width'
 
     return p
